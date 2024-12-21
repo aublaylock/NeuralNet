@@ -1,0 +1,2 @@
+TODO:
+- Nodes should know which layer they are in. Layers should know what network they are in.
