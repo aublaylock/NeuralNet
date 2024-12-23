@@ -2,7 +2,6 @@ import java.util.ArrayList;
 
 public class Layer {
     private final int inputSize;
-    private ArrayList<Node> nodes;
 
     private ArrayList<ArrayList<Float>> weights;
 
@@ -12,11 +11,6 @@ public class Layer {
     public Layer(Network network, int inputSize) {
         this.inputSize = inputSize;
         this.network = network;
-        this.nodes = new ArrayList<>();
-    }
-
-    public void addNode(Node node) {
-        nodes.add(node);
     }
 
     public void drawOutput() {
@@ -47,10 +41,6 @@ public class Layer {
 
     public int getInputSize() {
         return inputSize;
-    }
-
-    public int size() {
-        return nodes.size();
     }
 
     public Network getNetwork() {
