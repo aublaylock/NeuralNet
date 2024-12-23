@@ -51,32 +51,15 @@ public class Main {
     private static Network buildNetwork (int inputSize, int numHiddenLayers, int hiddenLayerSize, int outputSize) {
         Network network = new Network();
         //First Hidden Layer
-        addNewLayer(network, inputSize, hiddenLayerSize);
+        network.addNewLayer(inputSize, hiddenLayerSize);
         //Other Hidden Layers
         for (int i = 2; i <= numHiddenLayers; i++) {
-            addNewLayer(network, hiddenLayerSize, hiddenLayerSize);
+            network.addNewLayer(hiddenLayerSize, hiddenLayerSize);
         }
         //Output Layer
-        addNewLayer(network, hiddenLayerSize, outputSize);
+        network.addNewLayer(hiddenLayerSize, outputSize);
         return network;
     }
 
-    private static void addNewLayer(Network network, int inputSize, int layerSize) {
-        Layer layer = new Layer(network, inputSize);
-        ArrayList<ArrayList<Float>> weightMatrix = new ArrayList<>();
-        ArrayList<Float> biases = new ArrayList<>();
-        for (int i = 1; i <= layerSize; i++) {
-            ArrayList<Float> nodeWeights = new ArrayList<>();
-            float bias = (float)(RANDOM.nextFloat() - 0.5);
-            for (int j = 1; j <= inputSize; j++) {
-                nodeWeights.add((float)(RANDOM.nextFloat() - 0.5));
-            }
 
-            weightMatrix.add(nodeWeights);
-            biases.add(bias);
-            layer.setWeights(weightMatrix);
-            layer.setBiases(biases);
-        }
-        network.addLayer(layer);
-    }
 }

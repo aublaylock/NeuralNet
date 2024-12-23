@@ -23,7 +23,25 @@ public class Network {
         //Draw hidden layers
     }
 
-    //NOT SURE IF THIS WORKS, I HAVEN'T TESTED IT
+    public void addNewLayer(int inputSize, int layerSize) {
+        Layer layer = new Layer(this, inputSize);
+        ArrayList<ArrayList<Float>> weightMatrix = new ArrayList<>();
+        ArrayList<Float> biases = new ArrayList<>();
+        for (int i = 1; i <= layerSize; i++) {
+            ArrayList<Float> nodeWeights = new ArrayList<>();
+            float bias = (float)(Main.RANDOM.nextFloat() - 0.5);
+            for (int j = 1; j <= inputSize; j++) {
+                nodeWeights.add((float)(Main.RANDOM.nextFloat() - 0.5));
+            }
+
+            weightMatrix.add(nodeWeights);
+            biases.add(bias);
+            layer.setWeights(weightMatrix);
+            layer.setBiases(biases);
+        }
+        this.addLayer(layer);
+    }
+
     public float cost(ArrayList<ArrayList<Float>> examples, ArrayList<ArrayList<Float>> expectedOutputs) {
         if (examples.size() != expectedOutputs.size()) {
             throw new IllegalArgumentException("Examples size must equal expectedOutputs size. Examples size: " + examples.size() + ". expectedOutputs Size: " + expectedOutputs.size());
@@ -41,10 +59,6 @@ public class Network {
         }
         return allExamplesSum/((float)(examples.size()));
     }
-
-//    public ArrayList<Float> calculateGradient(ArrayList<ArrayList<Float>> examples, ArrayList<ArrayList<Float>> expectedOutputs,) {
-//
-//    }
 
     public ArrayList<Float> calculateOutput(ArrayList<Float> input) {
         //CHECK FOR CORRECT INPUT SIZE
