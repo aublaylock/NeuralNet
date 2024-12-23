@@ -3,9 +3,15 @@ import java.util.ArrayList;
 public class Network {
 
     private ArrayList<Layer> layers;
+    private String activationFunction;
 
     public Network() {
         this.layers = new ArrayList<>();
+        this.activationFunction = "relu";
+    }
+    public Network(String activationFunction) {
+        this.layers = new ArrayList<>();
+        this.activationFunction = activationFunction;
     }
 
     public void addLayer(Layer layer){
@@ -58,10 +64,14 @@ public class Network {
         return currentOutput;
     }
 
-    public float sigmoid(float num) {
-        return (float)(1.0 / (1 + Math.exp(-num)));
+    public float activation(float num) {
+        if (activationFunction.equals("sigmoid")) {
+            return (float)(1.0 / (1 + Math.exp(-num)));
+        }
+        else if (activationFunction.equals("relu")) {
+            return Math.max(0f, num);
+        }
+        throw new IllegalArgumentException("Activation function: " + activationFunction + ". But needs to be either 'relu' or 'sigmoid'.");
     }
-    public float relu(float num) {
-        return Math.max(0f, num);
-    }
+    
 }

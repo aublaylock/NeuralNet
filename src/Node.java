@@ -32,6 +32,6 @@ public class Node {
             index++;
         }
         sum += bias;
-        return layer.getNetwork().relu(sum);
+        return layer.getNetwork().activation(sum);
     }
 }
