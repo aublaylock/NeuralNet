@@ -63,17 +63,19 @@ public class Main {
 
     private static void addNewLayer(Network network, int inputSize, int layerSize) {
         Layer layer = new Layer(network, inputSize);
+        ArrayList<ArrayList<Float>> weightMatrix = new ArrayList<>();
+        ArrayList<Float> biases = new ArrayList<>();
         for (int i = 1; i <= layerSize; i++) {
-            Node node = new Node(layer);
-            ArrayList<Float> weights = new ArrayList<>();
+            ArrayList<Float> nodeWeights = new ArrayList<>();
             float bias = (float)(RANDOM.nextFloat() - 0.5);
             for (int j = 1; j <= inputSize; j++) {
-                weights.add((float)(RANDOM.nextFloat() - 0.5));
+                nodeWeights.add((float)(RANDOM.nextFloat() - 0.5));
             }
 
-            node.setWeights(weights);
-            node.setBias(bias);
-            layer.addNode(node);
+            weightMatrix.add(nodeWeights);
+            biases.add(bias);
+            layer.setWeights(weightMatrix);
+            layer.setBiases(biases);
         }
         network.addLayer(layer);
     }

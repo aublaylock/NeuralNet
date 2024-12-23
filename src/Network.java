@@ -7,7 +7,7 @@ public class Network {
 
     public Network() {
         this.layers = new ArrayList<>();
-        this.activationFunction = "relu";
+        this.activationFunction = "sigmoid";
     }
     public Network(String activationFunction) {
         this.layers = new ArrayList<>();
@@ -48,19 +48,10 @@ public class Network {
 
     public ArrayList<Float> calculateOutput(ArrayList<Float> input) {
         //CHECK FOR CORRECT INPUT SIZE
-        int index = 0;
         ArrayList<Float> currentOutput = input;
         for (Layer layer : layers) {
             currentOutput = layer.calculateOutput(currentOutput);
         }
-        float total = 0f;
-        for (float activation : currentOutput) {
-            total += activation;
-        }
-        for(int i = 0; i < currentOutput.size(); i++) {
-            currentOutput.set(i, currentOutput.get(i)/total);
-        }
-
         return currentOutput;
     }
 
