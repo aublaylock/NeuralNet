@@ -3,7 +3,7 @@ import java.util.ArrayList;
 public class Layer {
     private final int inputSize;
 
-    private ArrayList<ArrayList<Float>> weights;
+    private ArrayList<ArrayList<Float>> weightMatrix;
 
     private ArrayList<Float> biases;
     private final Network network;
@@ -13,17 +13,13 @@ public class Layer {
         this.network = network;
     }
 
-    public void drawOutput() {
-        //draw each node
-    }
-
     public ArrayList<Float> calculateOutput(ArrayList<Float> inputs) {
         if (inputs.size() != inputSize) {
             throw new IllegalArgumentException("Input size must be " + inputSize + ", but got " + inputs.size());
         }
         ArrayList<Float> outputs = new ArrayList<>();
         int nodeIndex = 0;
-        for (ArrayList<Float> nodeWeights : weights) {
+        for (ArrayList<Float> nodeWeights : weightMatrix) {
             int inputIndex = 0;
             float sum = 0f;
             float correspondingWeight = nodeWeights.get(inputIndex);
@@ -36,20 +32,48 @@ public class Layer {
             outputs.add(getNetwork().activation(sum));
             nodeIndex++;
         }
+        System.out.println("Shape: " + this.weightMatrix.size() + " x " + this.weightMatrix.getFirst().size());
         return outputs;
     }
+    public ArrayList<Float> dCostWRTPrevActivations(ArrayList<Float> dout, ArrayList<Float> prevActivations, ArrayList<Float> prevLogits, ArrayList<ArrayList<Float>> weightMatrix) {
+        ArrayList<Float> output = new ArrayList<>();
+        //For each neuron in previous layer
+        for (int i = 0; i <= prevActivations.size(); i++) {
+            //Calculate the derivative of the cost with respect to this neuron's activation
+            // sum of influences through each node in this layer
+            float sum = 0f;
+            //iterate over each weight connecting node in prevLayer to this layer
+            for (int j = 0; j <= this.size(); j++) {
+                //Add the derivative (chain rule)
 
-    public int getInputSize() {
-        return inputSize;
+                //Same as just the weight we are talking about
+                float dLogitWRTPrevActivation = weightMatrix.get(j).get(i);
+                //Same as just derivative of the activation function of the logit of the node we are deriving
+                float dActivationWRTLogit = network.dActivation(prevLogits.get(i));
+                //Same as just dout
+                float dCostWRTActivation = dout.get(j);
+
+
+                sum += dLogitWRTPrevActivation * dActivationWRTLogit * dCostWRTActivation;
+            }
+            output.add(sum);
+        }
+        return output;
     }
+    
+
+
 
     public Network getNetwork() {
         return network;
     }
-    public void setWeights(ArrayList<ArrayList<Float>> weights) {
-        this.weights = weights;
+    public void setWeightMatrix(ArrayList<ArrayList<Float>> weightMatrix) {
+        this.weightMatrix = weightMatrix;
     }
     public void setBiases(ArrayList<Float> biases) {
         this.biases = biases;
+    }
+    public float size() {
+        return this.biases.size();
     }
 }

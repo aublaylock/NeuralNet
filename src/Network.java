@@ -18,11 +18,6 @@ public class Network {
         layers.add(layer);
     }
 
-    public void drawOutput(/* ArrayList<Float> input */) {
-        //Draw input layer
-        //Draw hidden layers
-    }
-
     public void addNewLayer(int inputSize, int layerSize) {
         Layer layer = new Layer(this, inputSize);
         ArrayList<ArrayList<Float>> weightMatrix = new ArrayList<>();
@@ -36,7 +31,7 @@ public class Network {
 
             weightMatrix.add(nodeWeights);
             biases.add(bias);
-            layer.setWeights(weightMatrix);
+            layer.setWeightMatrix(weightMatrix);
             layer.setBiases(biases);
         }
         this.addLayer(layer);
@@ -78,5 +73,16 @@ public class Network {
         }
         throw new IllegalArgumentException("Activation function: " + activationFunction + ". But needs to be either 'relu' or 'sigmoid'.");
     }
+
+    public float dActivation(float num) {
+        if (activationFunction.equals("sigmoid")) {
+            return (float)(activation(num)*(1-activation(num)));
+        }
+        else if (activationFunction.equals("relu")) {
+            return (num>0) ? 1 : 0;
+        }
+        throw new IllegalArgumentException("Activation function: " + activationFunction + ". But needs to be either 'relu' or 'sigmoid'.");
+    }
+
     
 }
