@@ -59,9 +59,13 @@ public class Network {
         //CHECK FOR CORRECT INPUT SIZE
         ArrayList<Float> currentOutput = input;
         for (Layer layer : layers) {
-            currentOutput = layer.calculateOutput(currentOutput);
+            currentOutput = layer.calculateActivations(currentOutput);
         }
         return currentOutput;
+    }
+
+    public ArrayList<Float> calculateGradient(ArrayList<Float> input) {
+        
     }
 
     public float activation(float num) {
