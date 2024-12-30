@@ -35,7 +35,8 @@ public class Main {
         //BUILD NETWORK & PRINT OUTPUT
         Network network = buildNetwork(INPUT_SIZE, 1, 10, OUTPUT_SIZE);
         ArrayList<Float> output = network.calculateOutput(example);
-        System.out.println(output);
+        System.out.println("output: " + output);
+        System.out.println("cache: " + network.getCache(example));
         //END BUILD NETWORK & PRINT OUTPUT
 
         //TEST COST
@@ -43,7 +44,7 @@ public class Main {
         examples.add(example);
         ArrayList<ArrayList<Float>> expectedOutputs = new ArrayList<>();
         expectedOutputs.add(expectedOutput);
-        System.out.println(network.cost(examples, expectedOutputs));
+        System.out.println("cost: " + network.cost(examples, expectedOutputs));
         //END TEST COST
 
     }

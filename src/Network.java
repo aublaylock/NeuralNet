@@ -55,6 +55,16 @@ public class Network {
         return allExamplesSum/((float)(examples.size()));
     }
 
+    public ArrayList<ArrayList<Float>> getCache(ArrayList<Float> input) {
+        ArrayList<ArrayList<Float>> output = new ArrayList<>();
+        ArrayList<Float> currentOutput = input;
+        for (Layer layer : layers) {
+            output.add(currentOutput);
+            currentOutput = layer.calculateActivations(currentOutput);
+        }
+        output.add(currentOutput);
+        return output;
+    }
     public ArrayList<Float> calculateOutput(ArrayList<Float> input) {
         //CHECK FOR CORRECT INPUT SIZE
         ArrayList<Float> currentOutput = input;
@@ -64,9 +74,9 @@ public class Network {
         return currentOutput;
     }
 
-    public ArrayList<Float> calculateGradient(ArrayList<Float> input) {
-        
-    }
+//    public ArrayList<Float> calculateGradient(ArrayList<Float> input) {
+//
+//    }
 
     public float activation(float num) {
         if (activationFunction.equals("sigmoid")) {
