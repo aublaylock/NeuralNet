@@ -1,39 +1,19 @@
 import java.util.ArrayList;
-import java.util.Random;
+import java.util.random.*;
+
+import javax.swing.SwingUtilities;
 
 public class Main {
-    public static int INPUT_SIZE = 16;
+    public static int INPUT_SIZE = 784; // 28x28 pixels for MNIST
     public static int OUTPUT_SIZE = 10;
-    public static Random RANDOM = new Random();
-
+    public static java.util.Random RANDOM = new java.util.Random();
     public static void main(String[] args) {
-        Random random = new Random();
 
-        //CREATE TESTCASES
-//        ArrayList<ArrayList<Float>> examples = new ArrayList<>();
-//        ArrayList<ArrayList<Float>> expectedOutputs = new ArrayList<>();
-//        for (int i = 1; i <= 10; i++) {
-//            ArrayList<Float> example = new ArrayList<>();
-//            ArrayList<Float> expectedOutputs = new ArrayList<>();
-//            for (int j = 1; j <= INPUT_SIZE; j++) {
-//                example.add(1.0f / ((float)j));
-//            }
-//            examples.add(example);
-//        }
-        //END CREATE TESTCASE
+        
 
-        //Create a single test case
-        ArrayList<Float> example = new ArrayList<>();
-        ArrayList<Float> expectedOutput = new ArrayList<>();
-        for (int j = 1; j <= INPUT_SIZE; j++) {
-            example.add(1.0f / ((float)j));
-            expectedOutput.add(1f);
-        }
-        //END Create a single test case
-
-
+/**
         //BUILD NETWORK & PRINT OUTPUT
-        Network network = buildNetwork(INPUT_SIZE, 1, 10, OUTPUT_SIZE);
+        Network network = buildNetwork(INPUT_SIZE, 2, 10, OUTPUT_SIZE);
         ArrayList<Float> output = network.calculateOutput(example);
         System.out.println(output);
         //END BUILD NETWORK & PRINT OUTPUT
@@ -45,6 +25,55 @@ public class Main {
         expectedOutputs.add(expectedOutput);
         System.out.println(network.cost(examples, expectedOutputs));
         //END TEST COST
+
+    }
+*/
+        //LOAD MNIST DATA
+        ArrayList<ArrayList<Float>> trainImages = null;
+        ArrayList<ArrayList<Float>> trainLabels = null;
+
+    try {
+        int maxExamples = 10000; // for quick testing
+        trainImages = MNISTLoader.loadImages("/Users/austin/IdeaProjects/Basic Neural Network/data/train-images.idx3-ubyte", maxExamples);
+        trainLabels = MNISTLoader.loadLabels("/Users/austin/IdeaProjects/Basic Neural Network/data/train-labels.idx1-ubyte", maxExamples, OUTPUT_SIZE);
+    } 
+    catch (Exception e) {
+        e.printStackTrace();
+    }
+
+
+        //BUILD NETWORK
+        Network network = buildNetwork(INPUT_SIZE, 2, 50, OUTPUT_SIZE);
+
+        //TRAIN NETWORK/
+        int epochs = 5; // Lower for faster testing
+        float learningRate = 0.01f;
+        for (int epoch = 0; epoch < epochs; epoch++) {
+            float totalCost = 0f;
+            for (int i = 0; i < trainImages.size(); i++) {
+                ArrayList<Float> example = trainImages.get(i);
+                ArrayList<Float> expectedOutput = trainLabels.get(i);
+
+                // Backpropagation: compute gradients and update weights/biases
+                Gradient gradient = network.createGradient(example, expectedOutput);
+                network.updateWeightsAndBiases(gradient, learningRate);
+
+                // Only calculate cost once per example (after update)
+                float cost = network.cost(
+                    new ArrayList<>(java.util.List.of(example)),
+                    new ArrayList<>(java.util.List.of(expectedOutput))
+                );
+                totalCost += cost;
+            }
+            if (epoch % 2 == 0) { // Print every 2 epochs
+                System.out.println("Epoch " + epoch + " average cost: " + (totalCost / trainImages.size()));
+            }
+        }
+        //END TRAIN NETWORK
+
+        SwingUtilities.invokeLater(() -> {
+            new DigitDrawFrame(network).setVisible(true);
+        });
 
     }
 
