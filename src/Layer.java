@@ -16,40 +16,35 @@ public class Layer {
         this.network = network;
     }
 
-    public ArrayList<Float> calculateOutput(ArrayList<Float> inputs) {
-        if (inputs.size() != inputSize) {
-            throw new IllegalArgumentException("Input size must be " + inputSize + ", but got " + inputs.size());
+    public ArrayList<Float> calculateActivations(ArrayList<Float> inputs) {
+        ArrayList<Float> logits = calculateLogits(inputs);
+        ArrayList<Float> activations = new ArrayList<>();
+        for (float logit : logits) {
+            activations.add(getNetwork().activation(logit));
         }
-        ArrayList<Float> logits = new ArrayList<>();
-        ArrayList<Float> outputs = new ArrayList<>();
-        int nodeIndex = 0;
-        for (ArrayList<Float> nodeWeights : weightMatrix) {
-            int inputIndex = 0;
-            float sum = 0f;
-            for (Float input : inputs) {
-                sum += input * nodeWeights.get(inputIndex);
-                inputIndex++;
-            }
-            float correspondingBias = biases.get(nodeIndex);
-            sum += correspondingBias;
-            logits.add(sum);
-            //Apply activation function to the sum
-            outputs.add(getNetwork().activation(sum));
-            nodeIndex++;
+        this.lastActivations = activations;
+        return activations;
+    }
+
+    public ArrayList<Float> calculateLogits(ArrayList<Float> inputs) {
+    if (inputs.size() != inputSize) {
+        throw new IllegalArgumentException("Input size must be " + inputSize + ", but got " + inputs.size());
+    }
+    ArrayList<Float> logits = new ArrayList<>();
+    for (ArrayList<Float> nodeWeights : weightMatrix) {
+        float sum = 0f;
+        for (int i = 0; i < inputs.size(); i++) {
+            sum += inputs.get(i) * nodeWeights.get(i);
         }
-        // System.out.println("Shape: " + this.weightMatrix.size() + " x " + this.weightMatrix.getFirst().size());
-        this.lastLogits = logits;
-        this.lastActivations = outputs;
-        return outputs;
+        sum += biases.get(logits.size());
+        logits.add(sum);
+    }
+    this.lastLogits = logits;
+    return logits;
     }
 
     //INITIAL DERIVATIVES
-    public ArrayList<Float> dCostWRTPrevActivations(ArrayList<Float> dout, ArrayList<Float> prevActivations, ArrayList<Float> prevLogits, ArrayList<ArrayList<Float>> weightMatrix) {
-        if (prevLogits.isEmpty()) {
-            // No previous logits for the input layer, return zeros or skip
-            return new ArrayList<>();
-        }
-
+    public ArrayList<Float> dCostWRTPrevActivations(ArrayList<Float> dout, ArrayList<Float> prevActivations, ArrayList<Float> logits) {
         ArrayList<Float> output = new ArrayList<>();
         //For each neuron in previous layer
         for (int i = 0; i < prevActivations.size(); i++) {
@@ -61,9 +56,9 @@ public class Layer {
                 //Add the derivative (chain rule)
 
                 //Same as just the weight we are talking about
-                float dLogitWRTPrevActivation = weightMatrix.get(j).get(i);
+                float dLogitWRTPrevActivation = this.weightMatrix.get(j).get(i);
                 //Same as just derivative of the activation function of the logit of the node we are deriving
-                float dActivationWRTLogit = network.dActivation(prevLogits.get(i));
+                float dActivationWRTLogit = network.dActivation(logits.get(j));
                 //Same as just dout
                 float dCostWRTActivation = dout.get(j);
 
@@ -88,12 +83,11 @@ public class Layer {
         return gradients;
     }
 
-    public ArrayList<Float> dCostWRTBiases(ArrayList<Float> prevActivations, ArrayList<Float> douts) {
+    public ArrayList<Float> dCostWRTBiases(ArrayList<Float> douts) {
         ArrayList<Float> gradient = new ArrayList<>();
         for (int nodeIndex = 0; nodeIndex < biases.size(); nodeIndex++) {
-            float partial = douts.get(nodeIndex);
-            gradient.add(partial);
-        }
+                gradient.add(douts.get(nodeIndex));
+            }
         return gradient;
     }
 

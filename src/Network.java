@@ -55,14 +55,28 @@ public class Network {
         return allExamplesSum/((float)(examples.size()));
     }
 
+    public ArrayList<ArrayList<Float>> getCache(ArrayList<Float> input) {
+        ArrayList<ArrayList<Float>> output = new ArrayList<>();
+        ArrayList<Float> currentOutput = input;
+        for (Layer layer : layers) {
+            output.add(currentOutput);
+            currentOutput = layer.calculateActivations(currentOutput);
+        }
+        output.add(currentOutput);
+        return output;
+    }
     public ArrayList<Float> calculateOutput(ArrayList<Float> input) {
         //CHECK FOR CORRECT INPUT SIZE
         ArrayList<Float> currentOutput = input;
         for (Layer layer : layers) {
-            currentOutput = layer.calculateOutput(currentOutput);
+            currentOutput = layer.calculateActivations(currentOutput);
         }
         return currentOutput;
     }
+
+//    public ArrayList<Float> calculateGradient(ArrayList<Float> input) {
+//
+//    }
 
     public float activation(float num) {
         if (activationFunction.equals("sigmoid")) {
@@ -111,13 +125,13 @@ public class Network {
             ArrayList<Float> prevLogits = (i == 0) ? input : layers.get(i - 1).getLastLogits();
             // Calculate gradients for this layer
             ArrayList<ArrayList<Float>> dWeights = layer.dCostWRTWeights(prevActivations, dout);
-            ArrayList<Float> dBiases = layer.dCostWRTBiases(prevActivations, dout);
+            ArrayList<Float> dBiases = layer.dCostWRTBiases(dout);
 
             weightGradients.add(0, dWeights);
             biasGradients.add(0, dBiases);
 
             // Calculate dout for the next layer
-            dout = layer.dCostWRTPrevActivations(dout, prevActivations, prevLogits, layer.getWeightMatrix());
+            dout = layer.dCostWRTPrevActivations(dout, prevActivations, prevLogits);
         }
 
         return new Gradient(weightGradients, biasGradients);
